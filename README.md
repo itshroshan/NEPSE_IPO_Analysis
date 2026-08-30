@@ -129,8 +129,16 @@ Expected net return scales linearly with family account expansion ($n$), showing
 ![Expected Return Scaling](expected_return_scaling.png)
 
 ---
+## 6. Conclusion & Market Inefficiency
 
-## 6. Repository Structure
+The findings of this quantitative simulation reveal significant structural inefficiencies within the NEPSE 10-kitta lottery system, presenting a clear alpha-generation opportunity for retail participants.
+
+* **The $A^*$ Equilibrium Gap:** The model proves that the NEPSE primary market is currently operating far below its theoretical Nash Equilibrium. For an average mid-sized IPO, the break-even applicant threshold ($A^*$) approaches **15 to 17 million applicants** before fixed frictions drain the expected value to zero. Because actual market participation currently caps at around **1.5 to 2.5 million applicants**, the lottery remains a highly profitable, positive-EV structural arbitrage.
+* **The Quality Filter Paradox (Winner's Curse):** Applying fundamental analysis to filter IPOs ($Q > 0.5$) actively destroys portfolio returns. High-prestige issues attract such extreme oversubscription that the win probability approaches zero ($P_{\text{win}} \to 0$). The filtered strategy fails to secure enough winning lots to cover the fixed annual Demat and MeroShare maintenance drag, resulting in a negative 95% VaR.
+* **The Optimal Bidding Strategy:** The mathematically optimal approach is the **Unfiltered Naive Strategy** deployed across maximum available family accounts ($n$). By bidding on all issues indiscriminately, the strategy captures asymmetric listing-day returns (+100% to +300%) that effortlessly offset the trivial C-ASBA fees (NPR 10) lost on the occasional underperforming stock.
+
+---
+## 7. Repository Structure
 
 ```
 .
@@ -149,7 +157,7 @@ Expected net return scales linearly with family account expansion ($n$), showing
 
 ---
 
-## 7. Quickstart Guide
+## 8. Quickstart Guide
 
 ### Prerequisites
 
