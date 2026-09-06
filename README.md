@@ -58,10 +58,10 @@ $$Q_i = 0.5 \left( \frac{\text{NW}_i - \text{NW}_{\min}}{\text{NW}_{\max} - \tex
 
 ```mermaid
 graph TD
-    classDef data fill:#f9f9f9,stroke:#333,stroke-width:2px;
-    classDef script fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
-    classDef process fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
-    classDef output fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+    classDef data fill:#f9f9f9,stroke:#333,stroke-width:2px,color:#000000;
+    classDef script fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#000000;
+    classDef process fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000000;
+    classDef output fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#000000;
 
     A[("Primary Filings Data<br>(SEBON, CDSC, NEPSE)<br>nepse_ipo_raw.csv")]:::data
     B["Data Processing ETL<br>data_processor.py"]:::script
