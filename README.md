@@ -150,10 +150,9 @@ The findings of this quantitative simulation reveal significant structural ineff
 
 ```
 .
-├── CONTEXT.md                    # Research rules, math definitions, & data requirements
-├── methodology_changes.md        # Technical deviations (bootstrap, scraper pivot, penalties)
 ├── verify_helper.py              # IPO verification and scraper testing tool
 ├── data_processor.py             # Data pipeline: raw CSV -> clean CSV & model feature CSV
+├── models.py                     # Mathematical engine (EV, A*, Prestige Score formulas)
 ├── sim.py                        # Monte Carlo bootstrap simulation engine (10,000 runs)
 ├── plots.py                      # Visualization generator for distributions & EV scaling
 ├── nepse_ipo_raw.csv             # Raw input dataset

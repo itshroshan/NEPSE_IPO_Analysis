@@ -34,3 +34,7 @@ htmlcov/
 *.tmp
 *.temp
 *.bak
+
+context.md
+methodology_changes.md
+project_proposal.pdf
