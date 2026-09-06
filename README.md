@@ -56,17 +56,25 @@ $$Q_i = 0.5 \left( \frac{\text{NW}_i - \text{NW}_{\min}}{\text{NW}_{\max} - \tex
 
 **Data architecture & execution pipeline:**
 
-```
-┌─────────────────────────┐     ┌─────────────────────────┐     ┌─────────────────────────┐
-│  Primary Filings Data   │ ──► │    Data Processing ETL   │ ──► │    Derived Features     │
-│  (SEBON, CDSC, NEPSE)   │     │    (data_processor.py)    │     │ (EV_single, A*, p_win)  │
-└─────────────────────────┘     └─────────────────────────┘     └───────────┬─────────────┘
-                                                                              │
-                                                                              ▼
-┌─────────────────────────┐     ┌─────────────────────────┐     ┌─────────────────────────┐
-│  Visualizations & Plots │ ◄── │    Monte Carlo Engine    │ ◄── │   Empirical Bootstrap   │
-│  (return_dist, scaling) │     │    (10,000 iterations)   │     │  (noise injection)      │
-└─────────────────────────┘     └─────────────────────────┘     └─────────────────────────┘
+```mermaid
+graph TD
+    classDef data fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef script fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef process fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    classDef output fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+
+    A[("Primary Filings Data<br>(SEBON, CDSC, NEPSE)<br>nepse_ipo_raw.csv")]:::data
+    B["Data Processing ETL<br>data_processor.py"]:::script
+    C[("Derived Features<br>(EV_single, A*, p_win)<br>nepse_ipo_model.csv")]:::data
+    D["Empirical Bootstrap<br>(Noise Injection)"]:::process
+    E["Monte Carlo Engine<br>sim.py<br>(10,000 iterations)"]:::script
+    F["Visualizations & Plots<br>plots.py<br>(return_dist, scaling)"]:::output
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
 ```
 
 To optimize quantitative accuracy while handling real-world market constraints, three key engineering pivots were made:
