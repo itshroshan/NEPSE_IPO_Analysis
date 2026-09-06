@@ -59,7 +59,7 @@ $$Q_i = 0.5 \left( \frac{\text{NW}_i - \text{NW}_{\min}}{\text{NW}_{\max} - \tex
 ```
 ┌─────────────────────────┐     ┌─────────────────────────┐     ┌─────────────────────────┐
 │  Primary Filings Data   │ ──► │    Data Processing ETL   │ ──► │    Derived Features     │
-│  (SEBON, CDSC, NEPSE)   │     │    (process_data.py)     │     │ (EV_single, A*, p_win)  │
+│  (SEBON, CDSC, NEPSE)   │     │    (data_processor.py)    │     │ (EV_single, A*, p_win)  │
 └─────────────────────────┘     └─────────────────────────┘     └───────────┬─────────────┘
                                                                               │
                                                                               ▼
@@ -71,7 +71,7 @@ $$Q_i = 0.5 \left( \frac{\text{NW}_i - \text{NW}_{\min}}{\text{NW}_{\max} - \tex
 
 To optimize quantitative accuracy while handling real-world market constraints, three key engineering pivots were made:
 
-1. **Scraper anti-bot bypass.** Web scrapers encountered Cloudflare anti-bot blocks and CAPTCHA barriers on financial portals. Data collection was pivoted to a structured ETL pipeline (`process_data.py`) acting on verified primary historical filings (`nepse_ipo_raw.csv`), validated via helper scripts (`check_github.py`).
+1. **Scraper anti-bot bypass.** Web scrapers encountered Cloudflare anti-bot blocks and CAPTCHA barriers on financial portals. Data collection was pivoted to a structured ETL pipeline (`data_processor.py`) acting on verified primary historical filings (`nepse_ipo_raw.csv`), validated via helper scripts (`verify_helper.py`).
 2. **Empirical bootstrap vs. abstract copulas.** Abstract copulas can overfit small historical datasets and fail on heavy-tailed demand spikes. The simulation engine instead uses an empirical Monte Carlo bootstrap, sampling historical IPO horizons with replacement and injecting Gaussian noise $\epsilon \sim \mathcal{N}(0, \sigma^2)$.
 3. **Strict sideline penalty.** Maintenance fees ($C_{\text{annual}}$) are deducted even when the quality-filtered strategy skips an IPO. This ensures zero survivorship bias and realistic Sharpe ratio calculations.
 
@@ -84,7 +84,7 @@ To optimize quantitative accuracy while handling real-world market constraints, 
 | Parameter | Value |
 | :--- | :--- |
 | Application capital per lot ($K$) | NPR 1,000 |
-| C-ASBA application fee ($C_{\text{ASBA}}$) | NPR 10.00 |
+| C-ASBA application fee ($C_{\text{ASBA}}$) | NPR 15.00 |
 | Annual Demat / MeroShare maintenance cost ($C_{\text{annual}}$) | NPR 150.00 |
 | Capital lockup window ($t$) | 10–14 days |
 | Risk-free rate ($r$) | 6.00% p.a. |
@@ -94,9 +94,9 @@ To optimize quantitative accuracy while handling real-world market constraints, 
 
 | Ticker | Sector | Public Shares ($S$) | Valid Applicants ($A$) | Issue Price ($P_{\text{issue}}$) | Listing Price ($P_{\text{listing}}$) | Net Worth / Share | EPS |
 | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| CHCL | Hydro | 1,500,000 | 1,250,000 | 100 | 320 | 145.20 | 18.50 |
-| SHIVM | Manufacturing | 2,000,000 | 980,000 | 100 | 280 | 180.50 | 22.10 |
-| UNHPL | Hydro | 800,000 | 1,420,000 | 100 | 115 | 92.10 | 3.20 |
+| SARBTM | Manufacturing | 2,776,076 | 958,959 | 360.90 | 611.60 | 185.36 | 5.13 |
+| SONA | Manufacturing | 9,732,544 | 1,114,697 | 237.58 | 315.00 | 143.46 | 1.42 |
+| ILI | Life Insurance | 9,600,000 | 1,188,996 | 236.91 | 417.90 | 161.65 | 9.19 |
 
 ---
 
@@ -111,8 +111,8 @@ The simulation engine (`sim.py`) ran 10,000 stochastic iterations comparing two 
 
 | Metric | Unfiltered Naive Strategy | Quality-Filtered Strategy ($Q > 0.5$) | Interpretation |
 | :--- | ---: | ---: | :--- |
-| Expected annual net return | **NPR 8,500** | NPR 450 | Naive captures raw gain volume during market bull cycles. |
-| 95% Value-at-Risk (VaR) | **NPR 4,623** | −NPR 127 | High-Q issues dilute win rates ($P_{\text{win}} \to 0$), leaving fixed fees unrecovered. |
+| Expected annual net return | **NPR 10,964** | −NPR 25 | Naive captures raw gain volume during market bull cycles. |
+| 95% Value-at-Risk (VaR) | **NPR 6,005** | −NPR 150 | High-Q issues dilute win rates ($P_{\text{win}} \to 0$), leaving fixed fees unrecovered. |
 | Maximum drawdown | Minimal | Moderate | Filtered strategy suffers fee drag from sitting on the sidelines. |
 | Sharpe ratio | High (in bull market) | Low (dilution drag) | Demonstrates severe dilution on prime assets. |
 
@@ -133,7 +133,7 @@ Expected net return scales linearly with family account expansion ($n$), showing
 
 The findings of this quantitative simulation reveal significant structural inefficiencies within the NEPSE 10-kitta lottery system, presenting a clear alpha-generation opportunity for retail participants.
 
-* **The $A^*$ Equilibrium Gap:** The model proves that the NEPSE primary market is currently operating far below its theoretical Nash Equilibrium. For an average mid-sized IPO, the break-even applicant threshold ($A^*$) approaches **15 to 17 million applicants** before fixed frictions drain the expected value to zero. Because actual market participation currently caps at around **1.5 to 2.5 million applicants**, the lottery remains a highly profitable, positive-EV structural arbitrage.
+* **The $A^*$ Equilibrium Gap:** The model proves that the NEPSE primary market is currently operating far below its theoretical Nash Equilibrium. For an average mid-sized IPO, the break-even applicant threshold ($A^*$) approaches **36 million applicants** before fixed frictions drain the expected value to zero. Because actual market participation currently caps at around **2.6 million applicants**, the lottery remains a highly profitable, positive-EV structural arbitrage.
 * **The Quality Filter Paradox (Winner's Curse):** Applying fundamental analysis to filter IPOs ($Q > 0.5$) actively destroys portfolio returns. High-prestige issues attract such extreme oversubscription that the win probability approaches zero ($P_{\text{win}} \to 0$). The filtered strategy fails to secure enough winning lots to cover the fixed annual Demat and MeroShare maintenance drag, resulting in a negative 95% VaR.
 * **The Optimal Bidding Strategy:** The mathematically optimal approach is the **Unfiltered Naive Strategy** deployed across maximum available family accounts ($n$). By bidding on all issues indiscriminately, the strategy captures asymmetric listing-day returns (+100% to +300%) that effortlessly offset the trivial C-ASBA fees (NPR 10) lost on the occasional underperforming stock.
 
@@ -143,9 +143,9 @@ The findings of this quantitative simulation reveal significant structural ineff
 ```
 .
 ├── CONTEXT.md                    # Research rules, math definitions, & data requirements
-├── METHODOLOGY_ADDENDUM.md       # Technical deviations (bootstrap, scraper pivot, penalties)
-├── check_github.py               # Repository API checker & verification script
-├── process_data.py               # Data pipeline: raw CSV -> clean CSV & model feature CSV
+├── methodology_changes.md        # Technical deviations (bootstrap, scraper pivot, penalties)
+├── verify_helper.py              # IPO verification and scraper testing tool
+├── data_processor.py             # Data pipeline: raw CSV -> clean CSV & model feature CSV
 ├── sim.py                        # Monte Carlo bootstrap simulation engine (10,000 runs)
 ├── plots.py                      # Visualization generator for distributions & EV scaling
 ├── nepse_ipo_raw.csv             # Raw input dataset
@@ -170,19 +170,13 @@ pip install pandas numpy matplotlib seaborn requests
 
 ### Execution steps
 
-1. **Verify source connection & environment**
+1. **Run the data processing pipeline** — calculates single-account EV, equilibrium bounds ($A^*$), and win probabilities:
 
    ```bash
-   python check_github.py
+   python data_processor.py
    ```
 
-2. **Run the data processing pipeline** — calculates single-account EV, equilibrium bounds ($A^*$), and win probabilities:
-
-   ```bash
-   python process_data.py
-   ```
-
-3. **Execute the Monte Carlo simulation & generate plots** — runs 10,000 bootstrap iterations and outputs visualization charts:
+2. **Execute the Monte Carlo simulation & generate plots** — runs 10,000 bootstrap iterations and outputs visualization charts:
 
    ```bash
    python plots.py
