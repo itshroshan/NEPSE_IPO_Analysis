@@ -52,7 +52,7 @@ class MonteCarloEngine:
         noise_R = np.random.normal(0, self.sigma_R, size=(self.N_sim, self.M))
         
         sim_A = np.maximum(1, base_A + noise_A) # Demand cannot be negative
-        sim_R = np.maximum(0, base_R + noise_R) # Returns bounded at 0 for worst case
+        sim_R = np.maximum(-1.0, base_R + noise_R) # Returns bounded at -100% for worst case
         
         # 1. NAIVE STRATEGY (Participate in all M IPOs)
         # Compute dynamic probability given simulated demand
