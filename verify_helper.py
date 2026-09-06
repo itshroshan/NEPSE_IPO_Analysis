@@ -16,7 +16,7 @@ def generate_verification_links(symbol, company_name):
     
     # 2. Application Counts & Allotment Data (Google Search restricted to ShareSansar)
     query = urllib.parse.quote_plus(f"{company_name} IPO allotment sharesansar")
-    google_url = f"https://www.google.com/search?q={query}"
+    google_url = f"https://www.sharesansar.com/company/{symbol}"
     print(f"\n[2] Application Counts (ShareSansar via Google):")
     print(f"    URL: {google_url}")
     print(f"    Check: Valid Applications, Total Applied Shares")
